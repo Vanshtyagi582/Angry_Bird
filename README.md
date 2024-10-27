@@ -82,5 +82,3 @@ To set up, run, and test the project, follow these steps:
 - Google for assets
 
 ---
-Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
-For example, `core:clean` removes `build` folder only from the `core` project.
