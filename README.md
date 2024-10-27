@@ -46,8 +46,7 @@ The game's flow begins with initialization in `AngryBird.java`, where `SplashScr
         - **dispose()**: Cleans up resources once the level is exited.
 
 ### Flow Diagram
-
-![ap.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/d87485b0-6f18-496d-8cce-05cc5806aed5/0b982839-cc97-42e5-8667-f016516408a5/ap.png)
+![ap](https://github.com/user-attachments/assets/4c7ebd5c-c03f-4652-96e5-beaacf1271fb)
 
 ## Setup and Execution Instructions
 
