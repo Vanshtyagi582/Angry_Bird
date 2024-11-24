@@ -41,7 +41,7 @@ public class Pig implements Disposable {
         body = world.createBody(bodyDef);
         body.createFixture(fixtureDef);
 
-        body.setAngularDamping(1f);
+        body.setAngularDamping(3f);
 
         // Set userData for collision detection
         body.setUserData(this);  // Add this line to store a reference to the Pig object

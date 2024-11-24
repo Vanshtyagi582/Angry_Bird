@@ -111,12 +111,23 @@ public class LevelScreen implements Screen {
         birds.add(new YellowBird(134, 100, world, 1000f));
 
         blocks = new Array<>();
-        blocks.add(new WoodBlock(880, 50, world)); // Base block
-        blocks.add(new WoodBlock(880, 130, world)); // Middle block
-        blocks.add(new WoodBlock(960, 50, world)); // Base block
+        blocks.add(new WoodBlock(800, 50, world));
+        blocks.add(new WoodBlock(880, 50, world));
+        blocks.add(new Wood_hz(800, 90, world));
+
+        blocks.add(new WoodBlock(1000, 50, world));
+        blocks.add(new WoodBlock(1080, 50, world));
+        blocks.add(new Wood_hz(1000, 90, world));
+
+        blocks.add(new Wood_vr(900, 110, world));
+        blocks.add(new Wood_vr(1000, 110, world));
+
+        blocks.add(new Wood_hz(900, 230, world));
 
         pigs = new Array<>();
-        pigs.add(new SmallPig(900,240,world));
+        pigs.add(new SmallPig(860,160,world));
+        pigs.add(new SmallPig(1060,160,world));
+        pigs.add(new LargePig(940,300,world));
         // Pig on base block
     }
 
