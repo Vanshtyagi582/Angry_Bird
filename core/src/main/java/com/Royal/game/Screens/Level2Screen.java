@@ -27,7 +27,7 @@ public class Level2Screen implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1280, 800);
         batch = AngryBird.batch;
-        ground2=new Ground("ground2.png",0,0,1280,122);
+
 
         loadTextures();
         initializeGameElements();
@@ -46,24 +46,7 @@ public class Level2Screen implements Screen {
     }
 
     private void initializeGameElements() {
-        birds = new Array<>();
-        birds.add(new RedBird(30, 122));
-        birds.add(new BlueBird(90, 122));
-        birds.add(new YellowBird(300, 320));
 
-        pigs = new Array<>();
-        pigs.add(new SmallPig(660, 122));
-        pigs.add(new MediumPig(880, 285));
-        pigs.add(new LargePig(800, 362));
-
-        blocks = new Array<>();
-        blocks.add(new StoneBlock(880, 122));
-        blocks.add(new StoneBlock(800, 122));
-        blocks.add(new StoneBlock(720, 122));
-        blocks.add(new GlassBlock(800, 202));
-        blocks.add(new GlassBlock(800, 282));
-        blocks.add(new WoodBlock(880, 202));
-        blocks.add(new WoodBlock(960, 122));
     }
 
     @Override
