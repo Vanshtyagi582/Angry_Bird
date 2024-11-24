@@ -36,6 +36,8 @@ public abstract class Bird implements Disposable {
 
         body = world.createBody(bodyDef);
         body.createFixture(fixtureDef);
+
+        body.setAngularDamping(1f);
         (body).setUserData(this);
 
         shape.dispose();

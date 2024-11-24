@@ -5,7 +5,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
@@ -157,16 +159,31 @@ public class LevelScreen implements Screen {
                 Object userDataB = fixtureB.getBody().getUserData();
 
                 if (userDataA instanceof Pig && userDataB instanceof Bird) {
-                    ((Pig) userDataA).takeDamage(((Bird) userDataB).hitpoints); // Apply 10 damage to the pig
+                    ((Pig) userDataA).takeDamage(((Bird) userDataB).hitpoints);
                 } else if (userDataB instanceof Pig && userDataA instanceof Bird) {
-                    ((Pig) userDataB).takeDamage(((Bird) userDataA).hitpoints); // Apply 10 damage to the pig
+                    ((Pig) userDataB).takeDamage(((Bird) userDataA).hitpoints);
                 }
 
                 if (userDataA instanceof Block && userDataB instanceof Bird) {
-                    ((Block) userDataA).takeDamage(((Bird) userDataB).hitpoints);; // Apply 5 damage to the block
+                    ((Block) userDataA).takeDamage(((Bird) userDataB).hitpoints);
                 } else if (userDataB instanceof Block && userDataA instanceof Bird) {
-                    ((Block) userDataB).takeDamage(((Bird) userDataA).hitpoints); // Apply 5 damage to the block
+                    ((Block) userDataB).takeDamage(((Bird) userDataA).hitpoints);
                 }
+
+                if (userDataA instanceof Block && userDataB instanceof Pig) {
+                    ((Block) userDataA).takeDamage(20);
+                    ((Pig) userDataB).takeDamage(20);
+                } else if (userDataB instanceof Pig && userDataA instanceof Block) {
+                    ((Pig) userDataA).takeDamage(20);
+                    ((Block) userDataB).takeDamage(20);
+                }
+
+                if (userDataA instanceof Pig && userDataB instanceof Ground) {
+                    ((Pig) userDataA).setOnGround(true);
+                } else if (userDataB instanceof Pig && userDataA instanceof Ground) {
+                    ((Pig) userDataB).setOnGround(true);
+                }
+
             }
 
             @Override
@@ -185,10 +202,10 @@ public class LevelScreen implements Screen {
         Array<Pig> pigsToRemove = new Array<>();
 
         for (Pig pig : pigs) {
-            pig.updateTimeOnGround(delta);
 
-            // Remove the pig if it has been on the ground for more than 3 seconds
-            if (pig.getTimeOnGround() >= 0.5f || pig.health <= 0) {
+
+
+            if (pig.isOnGround() || pig.health <= 0) {
                 pigsToRemove.add(pig);
             }
         }
@@ -302,9 +319,54 @@ public class LevelScreen implements Screen {
         ground.render(batch);
         renderTrajectory();
 
-        for (Bird bird : birds) bird.getSprite().draw(batch);
-        for (Pig pig : pigs) pig.getSprite().draw(batch);
-        for (Block block : blocks) block.getSprite().draw(batch);
+        for (Bird bird : birds) {
+            Sprite sprite = bird.getSprite();
+            Body body = bird.getBody();
+
+            // Set the origin of the sprite to its center
+            sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
+
+            // Update sprite position and rotation
+            sprite.setPosition(body.getPosition().x * 100 - sprite.getWidth() / 2,
+                body.getPosition().y * 100 - sprite.getHeight() / 2);
+            sprite.setRotation(body.getAngle() * MathUtils.radiansToDegrees);
+
+            // Draw the sprite
+            sprite.draw(batch);
+        }
+
+        for (Pig pig : pigs) {
+            Sprite sprite = pig.getSprite();
+            Body body = pig.getBody();
+
+            // Set the origin of the sprite to its center
+            sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
+
+            // Update sprite position and rotation
+            sprite.setPosition(body.getPosition().x * 100 - sprite.getWidth() / 2,
+                body.getPosition().y * 100 - sprite.getHeight() / 2);
+            sprite.setRotation(body.getAngle() * MathUtils.radiansToDegrees);
+
+            // Draw the sprite
+            sprite.draw(batch);
+        }
+
+        for (Block block : blocks) {
+            Sprite sprite = block.getSprite();
+            Body body = block.getBody();
+
+            // Set the origin of the sprite to its center
+            sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
+
+            // Update sprite position and rotation
+            sprite.setPosition(body.getPosition().x * 100 - sprite.getWidth() / 2,
+                body.getPosition().y * 100 - sprite.getHeight() / 2);
+            sprite.setRotation(body.getAngle() * MathUtils.radiansToDegrees);
+
+            // Draw the sprite
+            sprite.draw(batch);
+        }
+
 
         float dotX = catapultAnchor.x * 100 - 2; // Convert to screen coordinates
         float dotY = catapultAnchor.y * 100 - 2;

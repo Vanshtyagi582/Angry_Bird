@@ -10,7 +10,7 @@ public class Pig implements Disposable {
     protected Sprite sprite;
     protected Body body;
     private float timeOnGround = 0;
-    private boolean onGround = false;
+    private boolean isOnGround = false;
     public int health;
     private World world;
 
@@ -41,6 +41,8 @@ public class Pig implements Disposable {
         body = world.createBody(bodyDef);
         body.createFixture(fixtureDef);
 
+        body.setAngularDamping(1f);
+
         // Set userData for collision detection
         body.setUserData(this);  // Add this line to store a reference to the Pig object
 
@@ -60,26 +62,21 @@ public class Pig implements Disposable {
         sprite.getTexture().dispose();
     }
 
-    public void setOnGround() {
-        if (!onGround) { // Start the timer only once
-            onGround = true;
-            timeOnGround = 0;
-        }
+    public void setOnGround(boolean isOnGround) {
+        this.isOnGround = isOnGround;
     }
 
-    public void updateTimeOnGround(float delta) {
-        if (onGround) {
-            timeOnGround += delta;
-        }
+    public boolean isOnGround() {
+        return isOnGround;
     }
+
+
 
     public float getTimeOnGround() {
         return timeOnGround;
     }
 
-    public boolean isOnGround() {
-        return onGround;
-    }
+
 
     public void takeDamage(float damage) {
         this.health -= damage;
@@ -90,12 +87,12 @@ public class Pig implements Disposable {
 
     private void markForDestruction() {
         // Here, we flag the block for destruction
-        LevelScreen.bodiesToDestroy.add(this.body);  // Assuming world manages bodies to destroy list
+        LevelScreen.bodiesToDestroy.add(this.body);
     }
 
     public void applyFallDamage() {
-        if (body.getLinearVelocity().y < -5) {  // Threshold for fall damage
-            takeDamage((int)(-body.getLinearVelocity().y / 5)); // Apply damage based on fall velocity
+        if (body.getLinearVelocity().y < -5) {
+            takeDamage((int)(-body.getLinearVelocity().y / 5));
         }
     }
 
