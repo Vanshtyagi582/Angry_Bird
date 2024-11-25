@@ -10,8 +10,9 @@ public abstract class Bird implements Disposable {
     protected Body body;
     private boolean launched;
     public int hitpoints;
+    public float scale;
 
-    public Bird(String texturePath, float size, float x, float y, World world, float weight,int hitpoints) {
+    public Bird(String texturePath, float size, float x, float y, World world, float weight,int hitpoints, float scale) {
         // Initialize sprite
         sprite = new Sprite(new Texture(texturePath));
         sprite.setSize(size, size);
@@ -32,6 +33,7 @@ public abstract class Bird implements Disposable {
         fixtureDef.friction = 0.8f;
         this.launched = false;
         this.hitpoints = hitpoints;
+        this.scale = scale;
 
 
         body = world.createBody(bodyDef);

@@ -4,7 +4,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class SmallPig extends Pig {
     public SmallPig( float x, float y, World world) {
-        super("small_pig.png", 40, x, y, world,80);
+        super("small_pig.png", 40, x, y, world,60);
     }
 }
 

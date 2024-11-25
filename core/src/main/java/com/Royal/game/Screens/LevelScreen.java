@@ -41,6 +41,12 @@ public class LevelScreen implements Screen {
     private Array<Vector2> trajectoryPoints = new Array<>();
     private boolean birdLaunched=false;
 
+    private float popupDelayTimer = 0f;
+    private boolean isPopupTriggered = false;
+    private boolean isGameWon = false;
+    private boolean isGameLost = false;
+
+
     public LevelScreen(AngryBird game) {
         this.game = game;
 
@@ -92,8 +98,7 @@ public class LevelScreen implements Screen {
     private void loadTextures() {
         background = new Texture("LEVEL-2.png");
         pauseButton = new Texture("pause.png");
-        winButton = new Texture("win.png");
-        lossButton = new Texture("loss.png");
+
         pausePopup = new Texture("pausepopup.png");
         winPopup = new Texture("win_.png");
         lossPopup = new Texture("loss_.png");
@@ -125,8 +130,8 @@ public class LevelScreen implements Screen {
         blocks.add(new Wood_hz(900, 230, world));
 
         pigs = new Array<>();
-        pigs.add(new SmallPig(860,160,world));
-        pigs.add(new SmallPig(1060,160,world));
+        //pigs.add(new SmallPig(860,160,world));
+        //pigs.add(new SmallPig(1060,160,world));
         pigs.add(new LargePig(940,300,world));
         // Pig on base block
     }
@@ -182,12 +187,25 @@ public class LevelScreen implements Screen {
                 }
 
                 if (userDataA instanceof Block && userDataB instanceof Pig) {
-                    ((Block) userDataA).takeDamage(20);
-                    ((Pig) userDataB).takeDamage(20);
-                } else if (userDataB instanceof Pig && userDataA instanceof Block) {
-                    ((Pig) userDataA).takeDamage(20);
-                    ((Block) userDataB).takeDamage(20);
+                    Block block = (Block) userDataA;
+                    Pig pig = (Pig) userDataB;
+
+                    // Check the block's velocity to prevent damage from slow rolling
+                    if (block.getBody().getLinearVelocity().len() > 0.5f) { // Adjust threshold as needed
+                        block.takeDamage(20);
+                        pig.takeDamage(20);
+                    }
+                } else if (userDataB instanceof Block && userDataA instanceof Pig) {
+                    Pig pig = (Pig) userDataA;
+                    Block block = (Block) userDataB;
+
+                    // Check the block's velocity to prevent damage from slow rolling
+                    if (block.getBody().getLinearVelocity().len() > 0.5f) { // Adjust threshold as needed
+                        block.takeDamage(20);
+                        pig.takeDamage(20);
+                    }
                 }
+
 
                 if (userDataA instanceof Pig && userDataB instanceof Ground) {
                     ((Pig) userDataA).setOnGround(true);
@@ -219,6 +237,10 @@ public class LevelScreen implements Screen {
             if (pig.isOnGround() || pig.health <= 0) {
                 pigsToRemove.add(pig);
             }
+            if (pig.getBody().getPosition().x > camera.viewportWidth / 100f) {
+
+                pigsToRemove.add(pig);
+            }
         }
 
         // Remove pigs from the world and the array
@@ -248,7 +270,7 @@ public class LevelScreen implements Screen {
 
         }
         bodiesToDestroy.clear();
-        // Clear the list after destroying
+
     }
 
 
@@ -261,7 +283,7 @@ public class LevelScreen implements Screen {
         Vector2 birdPosition = birdBody.getPosition();
 
         // Corrected: Calculate velocity in the release direction
-        Vector2 velocity = catapultAnchor.cpy().sub(birdPosition).scl(13f); // Forward velocity after release
+        Vector2 velocity = catapultAnchor.cpy().sub(birdPosition).scl(selectedBird.scale); // Forward velocity after release
 
         float timeStep = 0.1f; // Simulation step size
         Vector2 gravity = world.getGravity(); // Gravity vector
@@ -307,101 +329,83 @@ public class LevelScreen implements Screen {
         groundShape.dispose();
     }
 
+
+
     @Override
     public void render(float delta) {
         camera.update();
         updateBirdState();
-
         updatePigState(delta);
 
         world.step(1 / 60f, 6, 2);
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        renderTrajectory();
 
-        batch.draw(background, 0, 0, 1280, 800);
-        batch.draw(pauseButton, 20, 700, 80, 80);
-        batch.draw(winButton, 1150, 20, 100, 100);
-        batch.draw(lossButton, 1150, 120, 100, 100);
-        batch.draw(catapult, 120, 32, 100, 130);
-        batch.draw(level1, 640 - level1.getWidth() / 2, 700);
+        if (!renderPopups(delta)) { // Only render the game if no popups are active
+            batch.draw(background, 0, 0, 1280, 800);
+            batch.draw(pauseButton, 20, 700, 80, 80);
+            batch.draw(catapult, 120, 32, 100, 130);
+            batch.draw(level1, 640 - level1.getWidth() / 2, 700);
 
-        ground.render(batch);
-        renderTrajectory();
+            ground.render(batch);
 
-        for (Bird bird : birds) {
-            Sprite sprite = bird.getSprite();
-            Body body = bird.getBody();
+            renderTrajectory(); // Draw trajectory only if no popups are active
 
-            // Set the origin of the sprite to its center
-            sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
+            for (Bird bird : birds) {
+                Sprite sprite = bird.getSprite();
+                Body body = bird.getBody();
 
-            // Update sprite position and rotation
-            sprite.setPosition(body.getPosition().x * 100 - sprite.getWidth() / 2,
-                body.getPosition().y * 100 - sprite.getHeight() / 2);
-            sprite.setRotation(body.getAngle() * MathUtils.radiansToDegrees);
+                sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
+                sprite.setPosition(body.getPosition().x * 100 - sprite.getWidth() / 2,
+                    body.getPosition().y * 100 - sprite.getHeight() / 2);
+                sprite.setRotation(body.getAngle() * MathUtils.radiansToDegrees);
+                sprite.draw(batch);
+            }
 
-            // Draw the sprite
-            sprite.draw(batch);
+            for (Pig pig : pigs) {
+                Sprite sprite = pig.getSprite();
+                Body body = pig.getBody();
+
+                sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
+                sprite.setPosition(body.getPosition().x * 100 - sprite.getWidth() / 2,
+                    body.getPosition().y * 100 - sprite.getHeight() / 2);
+                sprite.setRotation(body.getAngle() * MathUtils.radiansToDegrees);
+                sprite.draw(batch);
+            }
+
+            for (Block block : blocks) {
+                Sprite sprite = block.getSprite();
+                Body body = block.getBody();
+
+                sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
+                sprite.setPosition(body.getPosition().x * 100 - sprite.getWidth() / 2,
+                    body.getPosition().y * 100 - sprite.getHeight() / 2);
+                sprite.setRotation(body.getAngle() * MathUtils.radiansToDegrees);
+                sprite.draw(batch);
+            }
+
+            float dotX = catapultAnchor.x * 100 - 2;
+            float dotY = catapultAnchor.y * 100 - 2;
+            batch.draw(dot, dotX, dotY, 5, 5);
         }
 
-        for (Pig pig : pigs) {
-            Sprite sprite = pig.getSprite();
-            Body body = pig.getBody();
-
-            // Set the origin of the sprite to its center
-            sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
-
-            // Update sprite position and rotation
-            sprite.setPosition(body.getPosition().x * 100 - sprite.getWidth() / 2,
-                body.getPosition().y * 100 - sprite.getHeight() / 2);
-            sprite.setRotation(body.getAngle() * MathUtils.radiansToDegrees);
-
-            // Draw the sprite
-            sprite.draw(batch);
-        }
-
-        for (Block block : blocks) {
-            Sprite sprite = block.getSprite();
-            Body body = block.getBody();
-
-            // Set the origin of the sprite to its center
-            sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
-
-            // Update sprite position and rotation
-            sprite.setPosition(body.getPosition().x * 100 - sprite.getWidth() / 2,
-                body.getPosition().y * 100 - sprite.getHeight() / 2);
-            sprite.setRotation(body.getAngle() * MathUtils.radiansToDegrees);
-
-            // Draw the sprite
-            sprite.draw(batch);
-        }
-
-
-        float dotX = catapultAnchor.x * 100 - 2; // Convert to screen coordinates
-        float dotY = catapultAnchor.y * 100 - 2;
-        batch.draw(dot, dotX, dotY, 5, 5);
-
-        if (showPausePopup) batch.draw(pausePopup, 340, 200, 600, 400);
-        if (showWinPopup) batch.draw(winPopup, 640 - winPopup.getWidth() / 2, 0, winPopup.getWidth(), 780);
-        if (showLossPopup) batch.draw(lossPopup, 640 - lossPopup.getWidth() / 2, 0, lossPopup.getWidth(), 780);
         destroyBodies();
-
         batch.end();
 
         debugRenderer.render(world, camera.combined);
-
         handleInput();
     }
 
 
+
+
     private void handleInput() {
+        if (showPausePopup || showWinPopup || showLossPopup) return; // Ignore inputs if a popup is active
+
         if (Gdx.input.justTouched()) {
             float touchX = Gdx.input.getX();
             float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
-
-            if (showPausePopup || showWinPopup || showLossPopup) return;
 
             if (selectedBird == null && !birdLaunched) {
                 for (Bird bird : birds) {
@@ -422,7 +426,7 @@ public class LevelScreen implements Screen {
             float touchY = Math.max(ground.getBounds().height / 100f + 0.5f, Math.min((Gdx.graphics.getHeight() - Gdx.input.getY()) / 100f, camera.viewportHeight / 100f - 0.5f));
 
             Vector2 dragPosition = new Vector2(touchX, touchY);
-            if (dragPosition.dst(catapultAnchor) > 1.0f) { // Restrict movement within catapult radius
+            if (dragPosition.dst(catapultAnchor) > 1.0f) {
                 dragPosition.sub(catapultAnchor).nor().scl(1.0f).add(catapultAnchor);
             }
 
@@ -435,16 +439,42 @@ public class LevelScreen implements Screen {
                 catapultJoint = null;
                 trajectoryPoints.clear();
 
-                // Apply velocity to the bird in the direction of the pull
-                Vector2 launchVelocity = catapultAnchor.cpy().sub(selectedBird.getBody().getPosition()).scl(13f);
+                Vector2 launchVelocity = catapultAnchor.cpy().sub(selectedBird.getBody().getPosition()).scl(selectedBird.scale);
                 selectedBird.getBody().setLinearVelocity(launchVelocity);
 
-                selectedBird.setLaunched(true); // Mark this bird as launched
-                birdLaunched = true;           // Prevent immediate reuse
+                selectedBird.setLaunched(true);
+                birdLaunched = true;
             }
             selectedBird = null;
         }
     }
+
+    private boolean renderPopups(float delta) {
+        if (isPopupTriggered) {
+            popupDelayTimer += delta;
+
+            if (popupDelayTimer >= 2f) {
+                if (isGameWon) {
+                    batch.draw(winPopup, 640 - winPopup.getWidth() / 2, 0, winPopup.getWidth(), 800);
+                } else if (isGameLost) {
+                    batch.draw(lossPopup, 640 - (lossPopup.getWidth() / 2), 0, lossPopup.getWidth(), 800);
+                }
+                return true;
+            }
+        } else {
+            if (pigs.isEmpty()) {
+                isPopupTriggered = true;
+                isGameWon = true;
+            } else if (birds.isEmpty() && !pigs.isEmpty()) {
+                isPopupTriggered = true;
+                isGameLost = true;
+            }
+        }
+
+        return false;
+    }
+
+
 
 
 
