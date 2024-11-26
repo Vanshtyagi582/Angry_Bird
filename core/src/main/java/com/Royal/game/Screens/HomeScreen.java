@@ -61,6 +61,9 @@ public class HomeScreen implements Screen {
                         game.setScreen(new Level2Screen(game));
 
                     }
+                    else if (i+1==3){
+                        game.setScreen(new Level3Screen(game));
+                    }
 
                 }
 

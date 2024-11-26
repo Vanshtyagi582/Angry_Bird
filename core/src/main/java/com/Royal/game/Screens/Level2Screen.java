@@ -157,7 +157,6 @@ public class Level2Screen implements Screen {
         pigs.add(new SmallPig(1140,160,world));
         pigs.add(new SmallPig(840,160,world));
         pigs.add(new LargePig(940,400,world));
-        // Pig on base block
     }
 
 
@@ -365,7 +364,6 @@ public class Level2Screen implements Screen {
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-
         if (!renderPopups(delta)) { // Only render the game if no popups are active
             batch.draw(background, 0, 0, 1280, 800);
             batch.draw(pauseButton, 20, 700, 80, 80);
@@ -425,11 +423,42 @@ public class Level2Screen implements Screen {
 
 
     private void handleInput() {
-        if (showPausePopup || showWinPopup || showLossPopup) return; // Ignore inputs if a popup is active
+        if (isGameWon || isGameLost ){
+            float touchX = Gdx.input.getX();
+            float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
+            if (isGameWon){
+                if (isButtonClicked(touchX, touchY, 453, 138, 90, 90)) {
+                    game.setScreen(new HomeScreen(game));
+
+                }
+                if (isButtonClicked(touchX, touchY, 592, 138, 90, 90)) {
+                    game.setScreen(new LevelScreen(game));
+
+                }
+                if (isButtonClicked(touchX, touchY, 734, 138, 90, 90)) {
+                    game.setScreen(new Level3Screen(game));
+
+                }
+                showWinPopup = false;
+
+            } else if (isGameLost) {
+
+                if (isButtonClicked(touchX, touchY, 505, 115, 100, 100)) {
+                    game.setScreen(new HomeScreen(game));
+
+                }
+                if (isButtonClicked(touchX, touchY,  669, 115, 100, 100)) {
+                    game.setScreen(new LevelScreen(game));
+
+                }
+
+            }
+        }; // Ignore inputs if a popup is active
 
         if (Gdx.input.justTouched()) {
             float touchX = Gdx.input.getX();
             float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
+
 
             if (selectedBird == null && !birdLaunched) {
                 for (Bird bird : birds) {
@@ -472,6 +501,23 @@ public class Level2Screen implements Screen {
             selectedBird = null;
         }
     }
+    private boolean isButtonClicked(float touchX, float touchY, float x, float y, float width, float height) {
+        // Check if the touch is inside the button region and if the touch is down and then up.
+        if (Gdx.input.justTouched()) {
+
+            touchX = Gdx.input.getX();
+            touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
+
+            // Check if the touch is within the button bounds
+            if (touchX >= x && touchX <= x + width && touchY >= y && touchY <= y + height) {
+                return true; // Button was clicked
+            }
+        }
+        return false;
+    }
+
+
+
 
     private boolean renderPopups(float delta) {
         if (isPopupTriggered) {
@@ -479,10 +525,12 @@ public class Level2Screen implements Screen {
 
             if (popupDelayTimer >= 2f) {
                 if (isGameWon) {
-                    batch.draw(winPopup, 640 - winPopup.getWidth() / 2, 0, winPopup.getWidth(), 800);
+                    batch.draw(winPopup, 640 - winPopup.getWidth() , 40, 2*winPopup.getWidth(), 2*winPopup.getHeight());
+
                 } else if (isGameLost) {
                     batch.draw(lossPopup, 640 - (lossPopup.getWidth() / 2), 0, lossPopup.getWidth(), 800);
                 }
+
                 return true;
             }
         } else {

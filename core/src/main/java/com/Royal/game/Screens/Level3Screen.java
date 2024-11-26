@@ -14,7 +14,7 @@ import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 import com.badlogic.gdx.utils.Array;
 
-public class LevelScreen implements Screen {
+public class Level3Screen implements Screen {
     private final AngryBird game;
     private OrthographicCamera camera;
     private SpriteBatch batch;
@@ -47,7 +47,7 @@ public class LevelScreen implements Screen {
     private boolean isGameLost = false;
 
 
-    public LevelScreen(AngryBird game) {
+    public Level3Screen(AngryBird game) {
         this.game = game;
 
         camera = new OrthographicCamera();
@@ -96,7 +96,7 @@ public class LevelScreen implements Screen {
 
 
     private void loadTextures() {
-        background = new Texture("LEVEL-2.png");
+        background = new Texture("LEVEL-3.jpg");
         pauseButton = new Texture("pause.png");
 
         pausePopup = new Texture("pausepopup.png");
@@ -116,24 +116,47 @@ public class LevelScreen implements Screen {
         birds.add(new YellowBird(134, 100, world, 1000f));
 
         blocks = new Array<>();
-        blocks.add(new WoodBlock(800, 50, world));
-        blocks.add(new WoodBlock(880, 50, world));
-        blocks.add(new Wood_hz(800, 90, world));
+        blocks.add(new StoneBlock(700, 50, world));
+        blocks.add(new StoneBlock(780, 50, world));
+        blocks.add(new Stone_hz(700, 90, world));
 
-        blocks.add(new WoodBlock(1000, 50, world));
-        blocks.add(new WoodBlock(1080, 50, world));
-        blocks.add(new Wood_hz(1000, 90, world));
+        blocks.add(new StoneBlock(900, 50, world));
+        blocks.add(new StoneBlock(980, 50, world));
+        blocks.add(new Stone_hz(900, 90, world));
 
+        blocks.add(new StoneBlock(1100, 50, world));
+        blocks.add(new StoneBlock(1180, 50, world));
+        blocks.add(new Stone_hz(1100, 90, world));
+
+        blocks.add(new Wood_vr(800, 110, world));
         blocks.add(new Wood_vr(900, 110, world));
         blocks.add(new Wood_vr(1000, 110, world));
+        blocks.add(new Wood_vr(1100, 110, world));
 
-        blocks.add(new Wood_hz(900, 230, world));
+        blocks.add(new Stone_hz(800, 230, world));
+        blocks.add(new Stone_hz(1000, 230, world));
+
+        blocks.add(new Glass_hz(900,250,world));
+        blocks.add(new StoneBlock(940, 270, world));
+        blocks.add(new StoneBlock(940, 310, world));
+        blocks.add(new Glass_hz(900,350,world));
+
+        blocks.add(new Glass_vr(820,250,world));
+        blocks.add(new Glass_vr(860,250,world));
+        blocks.add(new Glass_vr(1040,250,world));
+        blocks.add(new Glass_vr(1080,250,world));
+
+        blocks.add(new Glass_hz(800,370,world));
+        blocks.add(new Glass_hz(1000,370,world));
+
+
 
         pigs = new Array<>();
-        //pigs.add(new SmallPig(860,160,world));
-        //pigs.add(new SmallPig(1060,160,world));
-        pigs.add(new LargePig(940,300,world));
-        // Pig on base block
+        pigs.add(new SmallPig(720,160,world));
+        pigs.add(new SmallPig(1040,160,world));
+        pigs.add(new SmallPig(1140,160,world));
+        pigs.add(new SmallPig(840,160,world));
+        pigs.add(new LargePig(940,400,world));
     }
 
 
@@ -582,3 +605,4 @@ public class LevelScreen implements Screen {
     @Override
     public void hide() {}
 }
+
