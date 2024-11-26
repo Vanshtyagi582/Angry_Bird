@@ -27,8 +27,8 @@ public class Level3Screen implements Screen {
     private Box2DDebugRenderer debugRenderer;
 
     private Array<Bird> birds;
-    private Array<Pig> pigs;
-    private Array<Block> blocks;
+    private Array<Pig> pigs=new Array<>();
+    private Array<Block> blocks=new Array<>();
     public static Array<Body> bodiesToDestroy = new Array<>();
 
     private Ground ground;
@@ -110,54 +110,35 @@ public class Level3Screen implements Screen {
     private void initializeGameElements() {
         ground = new Ground("ground2.png", 0, 0, 1280, 50, world); // Ground texture
 
+        // Initialize the random structure generator
+//        RandomStructureGenerator structureGenerator = new RandomStructureGenerator(world);
+//
+//        // Generate random structure (blocks and pigs)
+//        structureGenerator.generateRandomStructure();
+//
+//        // Get the generated blocks and pigs
+//        Array<Block> blocks = structureGenerator.getBlocks();
+//        Array<Pig> pigs = structureGenerator.getPigs();
+//
+//        // Add blocks to the world (assuming your blocks are added to the game world in the same way as you did manually)
+//        for (Block block : blocks) {
+//            // You may want to add blocks to a list or handle them as needed
+//            this.blocks.add(block); // Add to game world or screen
+//        }
+//
+//        // Add pigs to the world
+//        for (Pig pig : pigs) {
+//            // Add pigs to the game world or screen
+//            this.pigs.add(pig); // Add to game world or screen
+//        }
+
+        // Initialize birds (example, you already have this part)
         birds = new Array<>();
         birds.add(new RedBird(32, 100, world, 1000f));
         birds.add(new BlueBird(83, 100, world, 1000f));
         birds.add(new YellowBird(134, 100, world, 1000f));
-
-        blocks = new Array<>();
-        blocks.add(new StoneBlock(700, 50, world));
-        blocks.add(new StoneBlock(780, 50, world));
-        blocks.add(new Stone_hz(700, 90, world));
-
-        blocks.add(new StoneBlock(900, 50, world));
-        blocks.add(new StoneBlock(980, 50, world));
-        blocks.add(new Stone_hz(900, 90, world));
-
-        blocks.add(new StoneBlock(1100, 50, world));
-        blocks.add(new StoneBlock(1180, 50, world));
-        blocks.add(new Stone_hz(1100, 90, world));
-
-        blocks.add(new Wood_vr(800, 110, world));
-        blocks.add(new Wood_vr(900, 110, world));
-        blocks.add(new Wood_vr(1000, 110, world));
-        blocks.add(new Wood_vr(1100, 110, world));
-
-        blocks.add(new Stone_hz(800, 230, world));
-        blocks.add(new Stone_hz(1000, 230, world));
-
-        blocks.add(new Glass_hz(900,250,world));
-        blocks.add(new StoneBlock(940, 270, world));
-        blocks.add(new StoneBlock(940, 310, world));
-        blocks.add(new Glass_hz(900,350,world));
-
-        blocks.add(new Glass_vr(820,250,world));
-        blocks.add(new Glass_vr(860,250,world));
-        blocks.add(new Glass_vr(1040,250,world));
-        blocks.add(new Glass_vr(1080,250,world));
-
-        blocks.add(new Glass_hz(800,370,world));
-        blocks.add(new Glass_hz(1000,370,world));
-
-
-
-        pigs = new Array<>();
-        pigs.add(new SmallPig(720,160,world));
-        pigs.add(new SmallPig(1040,160,world));
-        pigs.add(new SmallPig(1140,160,world));
-        pigs.add(new SmallPig(840,160,world));
-        pigs.add(new LargePig(940,400,world));
     }
+
 
 
 
@@ -501,6 +482,7 @@ public class Level3Screen implements Screen {
             selectedBird = null;
         }
     }
+
     private boolean isButtonClicked(float touchX, float touchY, float x, float y, float width, float height) {
         // Check if the touch is inside the button region and if the touch is down and then up.
         if (Gdx.input.justTouched()) {
@@ -515,6 +497,7 @@ public class Level3Screen implements Screen {
         }
         return false;
     }
+
 
 
 
