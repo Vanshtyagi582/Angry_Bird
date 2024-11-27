@@ -6,18 +6,20 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Disposable;
 
+import java.util.Objects;
+
 public abstract class Block implements Disposable {
     protected Sprite sprite;
     protected Body body;
     public int health;
     private World world;
-
+public String textu;
     public Block(String texturePath, float width, float height, float x, float y, World world, int health) {
         // Initialize sprite
         sprite = new Sprite(new Texture(texturePath));
         sprite.setSize(width, height);
         sprite.setPosition(x, y);
-
+textu=texturePath;
         // Create physics body
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody; // Blocks are dynamic, meaning they can move
@@ -62,6 +64,24 @@ public abstract class Block implements Disposable {
     private void markForDestruction() {
         // Here, we flag the block for destruction
         LevelScreen.bodiesToDestroy.add(this.body);  // Assuming world manages bodies to destroy list
+    }
+    public int getType(){
+        if(Objects.equals(textu, "stone_block.png")){
+            return 1;
+        }
+        if(Objects.equals(textu, "stone_vr.png")){
+            return 2;
+        }
+        if(Objects.equals(textu, "wood_hz.png")){
+            return 3;
+        }
+        if(Objects.equals(textu, "wood_vr.png")){
+            return 4;
+        }
+        if(Objects.equals(textu, "wood.png")){
+            return 5;
+        }
+        return 6;
     }
     public void setMaterial(String material) {
         // Define material properties

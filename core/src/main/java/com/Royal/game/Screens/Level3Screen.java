@@ -14,12 +14,18 @@ import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 import com.badlogic.gdx.utils.Array;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+
 public class Level3Screen implements Screen {
     private final AngryBird game;
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private boolean ispaused=false;
-
+    public boolean n_game;
+    public Data data;
 
     private Texture background, pauseButton, winButton, lossButton, pausePopup, winPopup, lossPopup, catapult, level1;
     private boolean showPausePopup = false, showWinPopup = false, showLossPopup = false;
@@ -27,7 +33,7 @@ public class Level3Screen implements Screen {
     private World world;
     private Box2DDebugRenderer debugRenderer;
 
-    private Array<Bird> birds;
+    private Array<Bird> birds=new Array<>();
     private Array<Pig> pigs=new Array<>();
     private Array<Block> blocks=new Array<>();
     public static Array<Body> bodiesToDestroy = new Array<>();
@@ -48,9 +54,10 @@ public class Level3Screen implements Screen {
     private boolean isGameLost = false;
 
 
-    public Level3Screen(AngryBird game) {
+    public Level3Screen(AngryBird game,boolean ng, Data d) {
         this.game = game;
-
+        data=d;
+        n_game=ng;
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1280, 800);
         batch = AngryBird.batch;
@@ -110,34 +117,86 @@ public class Level3Screen implements Screen {
 
     private void initializeGameElements() {
         ground = new Ground("ground2.png", 0, 0, 1280, 50, world); // Ground texture
+        if(!n_game){
+            for(Bird_data i: data.birds_data){
+                if(i.getType()==1){
+                    birds.add(new RedBird(i.getX(),i.getY(),world,1000f));
+                }
+                else if(i.getType()==2){
+                    birds.add(new BlueBird(i.getX(),i.getY(),world,1000f));
+                }
+                else{
+                    birds.add(new YellowBird(i.getX(),i.getY(),world,1000f));
+                }
+            }
+            for(Block_data i: data.blockData){
+                if(i.getType()==1){
+                    blocks.add(new StoneBlock(i.getX(),i.getY(),world));
+                }
+                else if(i.getType()==2){
+                    blocks.add(new Stone_vr(i.getX(),i.getY(),world));
+                }
+                else if(i.getType()==3){
+                    blocks.add(new Wood_hz(i.getX(),i.getY(),world));
+                }
+                else if(i.getType()==4){
+                    blocks.add(new Wood_vr(i.getX(),i.getY(),world));
+                }
+                else if(i.getType()==5){
+                    blocks.add(new WoodBlock(i.getX(),i.getY(),world));
+                }
 
-        // Initialize the random structure generator
-//        RandomStructureGenerator structureGenerator = new RandomStructureGenerator(world);
-//
-//        // Generate random structure (blocks and pigs)
-//        structureGenerator.generateRandomStructure();
-//
-//        // Get the generated blocks and pigs
-//        Array<Block> blocks = structureGenerator.getBlocks();
-//        Array<Pig> pigs = structureGenerator.getPigs();
-//
-//        // Add blocks to the world (assuming your blocks are added to the game world in the same way as you did manually)
-//        for (Block block : blocks) {
-//            // You may want to add blocks to a list or handle them as needed
-//            this.blocks.add(block); // Add to game world or screen
-//        }
-//
-//        // Add pigs to the world
-//        for (Pig pig : pigs) {
-//            // Add pigs to the game world or screen
-//            this.pigs.add(pig); // Add to game world or screen
-//        }
+            }
+            for(Pig_data i: data.pigs_data){
+                if(i.getType()==1){
+                    pigs.add(new SmallPig(i.getX(),i.getY(),world));
+                }
+                if(i.getType()==2){
+                    pigs.add(new MediumPig(i.getX(),i.getY(),world));
+                }
+                if(i.getType()==3){
+                    pigs.add(new LargePig(i.getX(),i.getY(),world));
+                }
 
-        // Initialize birds (example, you already have this part)
-        birds = new Array<>();
-        birds.add(new RedBird(32, 100, world, 1000f));
-        birds.add(new BlueBird(83, 100, world, 1000f));
-        birds.add(new YellowBird(134, 100, world, 1000f));
+            }
+        }
+        else{
+            blocks.add(new StoneBlock(700, 50, world));
+            blocks.add(new StoneBlock(780, 50, world));
+            blocks.add(new Stone_hz(700, 90, world));
+
+            blocks.add(new StoneBlock(900, 50, world));
+            blocks.add(new StoneBlock(980, 50, world));
+            blocks.add(new Stone_hz(900, 90, world));
+
+            blocks.add(new StoneBlock(1100, 50, world));
+            blocks.add(new StoneBlock(1180, 50, world));
+            blocks.add(new Stone_hz(1100, 90, world));
+
+            blocks.add(new Wood_vr(800, 110, world));
+            blocks.add(new Wood_vr(900, 110, world));
+            blocks.add(new Wood_vr(1000, 110, world));
+            blocks.add(new Wood_vr(1100, 110, world));
+
+            blocks.add(new Glass_hz(800, 230, world));
+            blocks.add(new Glass_hz(1000, 230, world));
+
+            blocks.add(new Glass_hz(900,250,world));
+            blocks.add(new StoneBlock(940, 270, world));
+            blocks.add(new StoneBlock(940, 310, world));
+            blocks.add(new Glass_hz(900,350,world));
+
+            birds = new Array<>();
+            birds.add(new RedBird(32, 100, world, 1000f));
+            birds.add(new BlueBird(83, 100, world, 1000f));
+            birds.add(new YellowBird(134, 100, world, 1000f));
+
+            pigs.add(new SmallPig(720,160,world));
+            pigs.add(new SmallPig(1040,160,world));
+            pigs.add(new SmallPig(1140,160,world));
+            pigs.add(new SmallPig(840,160,world));
+            pigs.add(new MediumPig(945,400,world));
+        }
     }
 
 
@@ -411,26 +470,21 @@ public class Level3Screen implements Screen {
             if (isGameWon){
                 if (isButtonClicked(touchX, touchY, 453, 138, 90, 90)) {
                     game.setScreen(new HomeScreen(game));
-
                 }
                 if (isButtonClicked(touchX, touchY, 592, 138, 90, 90)) {
-                    game.setScreen(new LevelScreen(game));
-
+                    game.setScreen(new Level3Screen(game,true,new Data()));
                 }
                 if (isButtonClicked(touchX, touchY, 734, 138, 90, 90)) {
-                    game.setScreen(new Level2Screen(game));
-
+                    game.setScreen(new LevelScreen(game,true,new Data()));
                 }
                 showWinPopup = false;
-
             } else if (isGameLost) {
-
                 if (isButtonClicked(touchX, touchY, 505, 115, 100, 100)) {
                     game.setScreen(new HomeScreen(game));
 
                 }
                 if (isButtonClicked(touchX, touchY,  669, 115, 100, 100)) {
-                    game.setScreen(new LevelScreen(game));
+                    game.setScreen(new Level3Screen(game,true,new Data()));
 
                 }
 
@@ -438,21 +492,39 @@ public class Level3Screen implements Screen {
             else if (ispaused){
                 if (isButtonClicked(touchX, touchY, 30, 232, 92, 92)) {
                     // save the game
+                    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("lvl3.dat"))) {
+                        ArrayList<Bird_data> bd=new ArrayList<>();
+                        ArrayList<Block_data> blc_d=new ArrayList<>();
+                        ArrayList<Pig_data> pd=new ArrayList<>();
+
+                        for(Bird i: birds){
+                            bd.add(new Bird_data(i));
+                        }
+                        for(Block i: blocks){
+                            blc_d.add(new Block_data(i));
+                        }
+                        for(Pig i: pigs){
+                            pd.add(new Pig_data(i));
+                        }
+                        data.pigs_data=pd;
+                        data.birds_data=bd;
+                        data.blockData=blc_d;
+                        oos.writeObject(data);
+                        System.out.println("Data saved successfully to " + "lvl3.dat");
+                    } catch (IOException e) {
+                        System.err.println("Error saving data: " + e.getMessage());
+                    }
                     game.setScreen(new HomeScreen(game));
 
                 }
                 if (isButtonClicked(touchX, touchY, 30, 455, 92, 92)) {
-                    game.setScreen(new LevelScreen(game));
-
-
+                    game.setScreen(new Level3Screen(game,true,new Data()));
                 }
                 if (isButtonClicked(touchX, touchY, 100, 358, 60, 60)) {
                     ispaused=false;
                     isPopupTriggered = false;
 
                 }
-
-
             }
         }; // Ignore inputs if a popup is active
 

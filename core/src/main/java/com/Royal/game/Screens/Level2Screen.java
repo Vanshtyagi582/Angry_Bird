@@ -14,11 +14,17 @@ import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 import com.badlogic.gdx.utils.Array;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+
 public class Level2Screen implements Screen {
     private final AngryBird game;
     private OrthographicCamera camera;
     private SpriteBatch batch;
-
+    public boolean n_game;
+    public Data data;
 
     private Texture background, pauseButton, winButton, lossButton, pausePopup, winPopup, lossPopup, catapult, level1;
     private boolean showPausePopup = false, showWinPopup = false, showLossPopup = false;
@@ -26,9 +32,9 @@ public class Level2Screen implements Screen {
     private World world;
     private Box2DDebugRenderer debugRenderer;
 
-    private Array<Bird> birds;
-    private Array<Pig> pigs;
-    private Array<Block> blocks;
+    private Array<Bird> birds= new Array<>();
+    private Array<Pig> pigs=new Array<>();
+    private Array<Block> blocks=new Array<>();
     public static Array<Body> bodiesToDestroy = new Array<>();
 
     private Ground ground;
@@ -48,9 +54,10 @@ public class Level2Screen implements Screen {
     private boolean ispaused=false;
 
 
-    public Level2Screen(AngryBird game) {
+    public Level2Screen(AngryBird game,boolean ng,Data d) {
         this.game = game;
-
+        n_game=ng;
+        data=d;
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1280, 800);
         batch = AngryBird.batch;
@@ -110,54 +117,91 @@ public class Level2Screen implements Screen {
 
     private void initializeGameElements() {
         ground = new Ground("ground2.png", 0, 0, 1280, 50, world); // Ground texture
+        if(!n_game){
+            for(Bird_data i: data.birds_data){
+                if(i.getType()==1){
+                    birds.add(new RedBird(i.getX(),i.getY(),world,1000f));
+                }
+                else if(i.getType()==2){
+                    birds.add(new BlueBird(i.getX(),i.getY(),world,1000f));
+                }
+                else{
+                    birds.add(new YellowBird(i.getX(),i.getY(),world,1000f));
+                }
+            }
+            for(Block_data i: data.blockData){
+                if(i.getType()==1){
+                    blocks.add(new StoneBlock(i.getX(),i.getY(),world));
+                }
+                else if(i.getType()==2){
+                    blocks.add(new Stone_vr(i.getX(),i.getY(),world));
+                }
+                else if(i.getType()==3){
+                    blocks.add(new Wood_hz(i.getX(),i.getY(),world));
+                }
+                else if(i.getType()==4){
+                    blocks.add(new Wood_vr(i.getX(),i.getY(),world));
+                }
+                else if(i.getType()==5){
+                    blocks.add(new WoodBlock(i.getX(),i.getY(),world));
+                }
 
-        birds = new Array<>();
-        birds.add(new RedBird(32, 100, world, 1000f));
-        birds.add(new BlueBird(83, 100, world, 1000f));
-        birds.add(new YellowBird(134, 100, world, 1000f));
+            }
+            for(Pig_data i: data.pigs_data){
+                if(i.getType()==1){
+                    pigs.add(new SmallPig(i.getX(),i.getY(),world));
+                }
+                if(i.getType()==2){
+                    pigs.add(new MediumPig(i.getX(),i.getY(),world));
+                }
+                if(i.getType()==3){
+                    pigs.add(new LargePig(i.getX(),i.getY(),world));
+                }
 
-        blocks = new Array<>();
-        blocks.add(new StoneBlock(700, 50, world));
-        blocks.add(new StoneBlock(780, 50, world));
-        blocks.add(new Stone_hz(700, 90, world));
+            }
+        }
+        else{
+            birds = new Array<>();
+            birds.add(new RedBird(32, 100, world, 1000f));
+            birds.add(new BlueBird(83, 100, world, 1000f));
+            birds.add(new YellowBird(134, 100, world, 1000f));
 
-        blocks.add(new StoneBlock(900, 50, world));
-        blocks.add(new StoneBlock(980, 50, world));
-        blocks.add(new Stone_hz(900, 90, world));
+            blocks = new Array<>();
+            blocks.add(new StoneBlock(700, 50, world));
+            blocks.add(new StoneBlock(780, 50, world));
+            blocks.add(new Stone_hz(700, 90, world));
 
-        blocks.add(new StoneBlock(1100, 50, world));
-        blocks.add(new StoneBlock(1180, 50, world));
-        blocks.add(new Stone_hz(1100, 90, world));
+            blocks.add(new StoneBlock(900, 50, world));
+            blocks.add(new StoneBlock(980, 50, world));
+            blocks.add(new Stone_hz(900, 90, world));
 
-        blocks.add(new Wood_vr(800, 110, world));
-        blocks.add(new Wood_vr(900, 110, world));
-        blocks.add(new Wood_vr(1000, 110, world));
-        blocks.add(new Wood_vr(1100, 110, world));
+            blocks.add(new StoneBlock(1100, 50, world));
+            blocks.add(new StoneBlock(1180, 50, world));
+            blocks.add(new Stone_hz(1100, 90, world));
 
-        blocks.add(new Stone_hz(800, 230, world));
-        blocks.add(new Stone_hz(1000, 230, world));
+            blocks.add(new Wood_vr(800, 110, world));
+            blocks.add(new Wood_vr(900, 110, world));
+            blocks.add(new Wood_vr(1000, 110, world));
+            blocks.add(new Wood_vr(1100, 110, world));
 
-        blocks.add(new Glass_hz(900,250,world));
-        blocks.add(new StoneBlock(940, 270, world));
-        blocks.add(new StoneBlock(940, 310, world));
-        blocks.add(new Glass_hz(900,350,world));
-//
-//        blocks.add(new Glass_vr(820,250,world));
-//        blocks.add(new Glass_vr(860,250,world));
-//        blocks.add(new Glass_vr(1040,250,world));
-//        blocks.add(new Glass_vr(1080,250,world));
-//
-//        blocks.add(new Glass_hz(800,370,world));
-//        blocks.add(new Glass_hz(1000,370,world));
+            blocks.add(new Stone_hz(800, 230, world));
+            blocks.add(new Stone_hz(1000, 230, world));
+
+            blocks.add(new Glass_hz(900,250,world));
+            blocks.add(new StoneBlock(940, 270, world));
+            blocks.add(new StoneBlock(940, 310, world));
+            blocks.add(new Glass_hz(900,350,world));
 
 
 
-        pigs = new Array<>();
-        pigs.add(new SmallPig(720,160,world));
-        pigs.add(new SmallPig(1040,160,world));
-        pigs.add(new SmallPig(1140,160,world));
-        pigs.add(new SmallPig(840,160,world));
-        pigs.add(new LargePig(940,400,world));
+            pigs = new Array<>();
+            pigs.add(new SmallPig(720,160,world));
+            pigs.add(new SmallPig(1040,160,world));
+            pigs.add(new SmallPig(1140,160,world));
+            pigs.add(new SmallPig(840,160,world));
+            pigs.add(new LargePig(940,400,world));
+        }
+
     }
 
 
@@ -173,18 +217,6 @@ public class Level2Screen implements Screen {
         boundaryDef.position.set(0, camera.viewportHeight / 2 / 100f);
         Body leftWall = world.createBody(boundaryDef);
         leftWall.createFixture(wallShape, 0);
-
-//        // Right wall
-//        boundaryDef.position.set(camera.viewportWidth / 100f, camera.viewportHeight / 2 / 100f);
-//        Body rightWall = world.createBody(boundaryDef);
-//        rightWall.createFixture(wallShape, 0);
-
-//        // Top wall
-//        wallShape.setAsBox(camera.viewportWidth / 2 / 100f, 1 / 100f);
-//        boundaryDef.position.set(camera.viewportWidth / 2 / 100f, camera.viewportHeight / 100f);
-//        Body topWall = world.createBody(boundaryDef);
-//        topWall.createFixture(wallShape, 0);
-
         wallShape.dispose();
     }
     private void setupContactListener() {
@@ -430,26 +462,26 @@ public class Level2Screen implements Screen {
             if (isGameWon){
                 if (isButtonClicked(touchX, touchY, 453, 138, 90, 90)) {
                     game.setScreen(new HomeScreen(game));
-
                 }
                 if (isButtonClicked(touchX, touchY, 592, 138, 90, 90)) {
-                    game.setScreen(new Level2Screen(game));
+                    game.setScreen(new Level2Screen(game,true,new Data()));
 
                 }
                 if (isButtonClicked(touchX, touchY, 734, 138, 90, 90)) {
-                    game.setScreen(new Level3Screen(game));
+                    game.setScreen(new Level3Screen(game,true,new Data()));
 
                 }
                 showWinPopup = false;
 
-            } else if (isGameLost) {
+            }
+            else if (isGameLost) {
 
                 if (isButtonClicked(touchX, touchY, 505, 115, 100, 100)) {
                     game.setScreen(new HomeScreen(game));
 
                 }
                 if (isButtonClicked(touchX, touchY,  669, 115, 100, 100)) {
-                    game.setScreen(new Level2Screen(game));
+                    game.setScreen(new Level2Screen(game,true,new Data()));
 
                 }
 
@@ -457,21 +489,36 @@ public class Level2Screen implements Screen {
             else if (ispaused){
                 if (isButtonClicked(touchX, touchY, 30, 232, 92, 92)) {
                     // save the game
+                    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("lvl2.dat"))) {
+                        ArrayList<Bird_data> bd=new ArrayList<>();
+                        ArrayList<Block_data> blc_d=new ArrayList<>();
+                        ArrayList<Pig_data> pd=new ArrayList<>();
+                        for(Bird i: birds){
+                            bd.add(new Bird_data(i));
+                        }
+                        for(Block i: blocks){
+                            blc_d.add(new Block_data(i));
+                        }
+                        for(Pig i: pigs){
+                            pd.add(new Pig_data(i));
+                        }
+                        data.pigs_data=pd;
+                        data.birds_data=bd;
+                        data.blockData=blc_d;
+                        oos.writeObject(data);
+                        System.out.println("Data saved successfully to " + "lvl2.dat");
+                    } catch (IOException e) {
+                        System.err.println("Error saving data: " + e.getMessage());
+                    }
                     game.setScreen(new HomeScreen(game));
-
                 }
                 if (isButtonClicked(touchX, touchY, 30, 455, 92, 92)) {
-                    game.setScreen(new Level2Screen(game));
-
-
+                    game.setScreen(new Level2Screen(game,true,new Data()));
                 }
                 if (isButtonClicked(touchX, touchY, 100, 358, 60, 60)) {
                     ispaused=false;
                     isPopupTriggered = false;
-
                 }
-
-
             }
         }
 
