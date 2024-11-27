@@ -48,6 +48,7 @@ public class MainMenuScreen implements Screen {
                 touchY >= quitY && touchY <= quitY + quitHeight) {
                 Gdx.app.exit();
             }
+            //phle yei dekh
         }
     }
 

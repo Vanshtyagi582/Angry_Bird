@@ -18,6 +18,7 @@ public class Level3Screen implements Screen {
     private final AngryBird game;
     private OrthographicCamera camera;
     private SpriteBatch batch;
+    private boolean ispaused=false;
 
 
     private Texture background, pauseButton, winButton, lossButton, pausePopup, winPopup, lossPopup, catapult, level1;
@@ -99,7 +100,7 @@ public class Level3Screen implements Screen {
         background = new Texture("LEVEL-3.jpg");
         pauseButton = new Texture("pause.png");
 
-        pausePopup = new Texture("pausepopup.png");
+        pausePopup = new Texture("pause1.png");
         winPopup = new Texture("win_.png");
         lossPopup = new Texture("loss_.png");
         catapult = new Texture("catapult.png");
@@ -404,7 +405,7 @@ public class Level3Screen implements Screen {
 
 
     private void handleInput() {
-        if (isGameWon || isGameLost ){
+        if (isGameWon || isGameLost || ispaused ){
             float touchX = Gdx.input.getX();
             float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
             if (isGameWon){
@@ -432,6 +433,25 @@ public class Level3Screen implements Screen {
                     game.setScreen(new LevelScreen(game));
 
                 }
+
+            }
+            else if (ispaused){
+                if (isButtonClicked(touchX, touchY, 30, 232, 92, 92)) {
+                    // save the game
+                    game.setScreen(new HomeScreen(game));
+
+                }
+                if (isButtonClicked(touchX, touchY, 30, 455, 92, 92)) {
+                    game.setScreen(new LevelScreen(game));
+
+
+                }
+                if (isButtonClicked(touchX, touchY, 100, 358, 60, 60)) {
+                    ispaused=false;
+                    isPopupTriggered = false;
+
+                }
+
 
             }
         }; // Ignore inputs if a popup is active
@@ -513,6 +533,9 @@ public class Level3Screen implements Screen {
                 } else if (isGameLost) {
                     batch.draw(lossPopup, 640 - (lossPopup.getWidth() / 2), 0, lossPopup.getWidth(), 800);
                 }
+                else if(ispaused){
+                    batch.draw(pausePopup, 0, 0, pausePopup.getWidth()+200, 800);
+                }
 
                 return true;
             }
@@ -523,6 +546,16 @@ public class Level3Screen implements Screen {
             } else if (birds.isEmpty() && !pigs.isEmpty()) {
                 isPopupTriggered = true;
                 isGameLost = true;
+            }
+            else if(Gdx.input.isTouched()){
+                float touchX = Gdx.input.getX();
+                float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
+
+                if (isButtonClicked(touchX,touchY,20, 700, 80, 80)) {
+                    isPopupTriggered = true;
+                    ispaused = true;
+
+                }
             }
         }
 

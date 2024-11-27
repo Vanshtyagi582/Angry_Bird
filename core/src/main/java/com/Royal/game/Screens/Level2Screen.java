@@ -45,6 +45,7 @@ public class Level2Screen implements Screen {
     private boolean isPopupTriggered = false;
     private boolean isGameWon = false;
     private boolean isGameLost = false;
+    private boolean ispaused=false;
 
 
     public Level2Screen(AngryBird game) {
@@ -99,11 +100,11 @@ public class Level2Screen implements Screen {
         background = new Texture("LEVEL-3.jpg");
         pauseButton = new Texture("pause.png");
 
-        pausePopup = new Texture("pausepopup.png");
+        pausePopup = new Texture("pause1.png");
         winPopup = new Texture("win_.png");
         lossPopup = new Texture("loss_.png");
         catapult = new Texture("catapult.png");
-        level1 = new Texture("Level2.png");
+        level1 = new Texture("Level1.png");
         dot = new Texture("dot.png");
     }
 
@@ -140,14 +141,14 @@ public class Level2Screen implements Screen {
         blocks.add(new StoneBlock(940, 270, world));
         blocks.add(new StoneBlock(940, 310, world));
         blocks.add(new Glass_hz(900,350,world));
-
-        blocks.add(new Glass_vr(820,250,world));
-        blocks.add(new Glass_vr(860,250,world));
-        blocks.add(new Glass_vr(1040,250,world));
-        blocks.add(new Glass_vr(1080,250,world));
-
-        blocks.add(new Glass_hz(800,370,world));
-        blocks.add(new Glass_hz(1000,370,world));
+//
+//        blocks.add(new Glass_vr(820,250,world));
+//        blocks.add(new Glass_vr(860,250,world));
+//        blocks.add(new Glass_vr(1040,250,world));
+//        blocks.add(new Glass_vr(1080,250,world));
+//
+//        blocks.add(new Glass_hz(800,370,world));
+//        blocks.add(new Glass_hz(1000,370,world));
 
 
 
@@ -423,7 +424,7 @@ public class Level2Screen implements Screen {
 
 
     private void handleInput() {
-        if (isGameWon || isGameLost ){
+        if (isGameWon || isGameLost || ispaused){
             float touchX = Gdx.input.getX();
             float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
             if (isGameWon){
@@ -432,7 +433,7 @@ public class Level2Screen implements Screen {
 
                 }
                 if (isButtonClicked(touchX, touchY, 592, 138, 90, 90)) {
-                    game.setScreen(new LevelScreen(game));
+                    game.setScreen(new Level2Screen(game));
 
                 }
                 if (isButtonClicked(touchX, touchY, 734, 138, 90, 90)) {
@@ -448,12 +449,31 @@ public class Level2Screen implements Screen {
 
                 }
                 if (isButtonClicked(touchX, touchY,  669, 115, 100, 100)) {
-                    game.setScreen(new LevelScreen(game));
+                    game.setScreen(new Level2Screen(game));
 
                 }
 
             }
-        }; // Ignore inputs if a popup is active
+            else if (ispaused){
+                if (isButtonClicked(touchX, touchY, 30, 232, 92, 92)) {
+                    // save the game
+                    game.setScreen(new HomeScreen(game));
+
+                }
+                if (isButtonClicked(touchX, touchY, 30, 455, 92, 92)) {
+                    game.setScreen(new Level2Screen(game));
+
+
+                }
+                if (isButtonClicked(touchX, touchY, 100, 358, 60, 60)) {
+                    ispaused=false;
+                    isPopupTriggered = false;
+
+                }
+
+
+            }
+        }
 
         if (Gdx.input.justTouched()) {
             float touchX = Gdx.input.getX();
@@ -525,14 +545,21 @@ public class Level2Screen implements Screen {
 
             if (popupDelayTimer >= 2f) {
                 if (isGameWon) {
-                    batch.draw(winPopup, 640 - winPopup.getWidth() , 40, 2*winPopup.getWidth(), 2*winPopup.getHeight());
+                    batch.draw(winPopup, 640 - winPopup.getWidth(), 40, 2 * winPopup.getWidth(), 2 * winPopup.getHeight());
 
-                } else if (isGameLost) {
+                }else if (isGameLost) {
                     batch.draw(lossPopup, 640 - (lossPopup.getWidth() / 2), 0, lossPopup.getWidth(), 800);
                 }
-
+                else if(ispaused){
+                    batch.draw(pausePopup, 0, 0, pausePopup.getWidth()+200, 800);
+                }
                 return true;
+
+
+
             }
+
+
         } else {
             if (pigs.isEmpty()) {
                 isPopupTriggered = true;
@@ -540,6 +567,16 @@ public class Level2Screen implements Screen {
             } else if (birds.isEmpty() && !pigs.isEmpty()) {
                 isPopupTriggered = true;
                 isGameLost = true;
+            }
+            else if(Gdx.input.isTouched()){
+                float touchX = Gdx.input.getX();
+                float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
+
+                if (isButtonClicked(touchX,touchY,20, 700, 80, 80)) {
+                    isPopupTriggered = true;
+                    ispaused = true;
+
+                }
             }
         }
 
