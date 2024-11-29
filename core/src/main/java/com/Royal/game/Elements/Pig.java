@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Disposable;
 
+import java.util.Objects;
+
 public class Pig implements Disposable {
     protected Sprite sprite;
     protected Body body;
@@ -13,13 +15,13 @@ public class Pig implements Disposable {
     private boolean isOnGround = false;
     public int health;
     private World world;
-
+    String textu;
     public Pig(String texturePath, float size, float x, float y, World world, int health) {
         // Initialize sprite
         sprite = new Sprite(new Texture(texturePath));
         sprite.setSize(size, size);
         sprite.setPosition(x, y);
-
+    textu=texturePath;
         // Create physics body
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody; // Pigs should react to physics
@@ -84,7 +86,18 @@ public class Pig implements Disposable {
             markForDestruction();  // Mark the block for destruction
         }
     }
-
+    public int getType() {
+        if(Objects.equals(textu, "small_pig.png")){
+            return 1;
+        }
+        if(Objects.equals(textu, "mid_pig.png")){
+            return 2;
+        }
+        if(Objects.equals(textu, "KING.png")){
+            return 3;
+        }
+        return 4;
+    }
     private void markForDestruction() {
         // Here, we flag the block for destruction
         LevelScreen.bodiesToDestroy.add(this.body);

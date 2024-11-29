@@ -7,6 +7,10 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 public class HomeScreen implements Screen {
     private AngryBird game;
     private SpriteBatch batch;
@@ -50,32 +54,62 @@ public class HomeScreen implements Screen {
     private void showLoad(){
         if(loadpopup){
             batch.begin();
-            batch.draw(load,40+300,90+150,3*200,3*100);
+            batch.draw(load,40+300,90+150,600,300);
             batch.end();
             float touchX = Gdx.input.getX();
             float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
             if (isButtonClicked(touchX, touchY, 388,280,203,80)) {
                 //new game
                 if(level==1){
-                    game.setScreen(new LevelScreen(game));
+                    game.setScreen(new LevelScreen(game,true,new Data()));
                 }
                 else if(level==2){
-                    game.setScreen(new Level2Screen(game));
+                    game.setScreen(new Level2Screen(game,true,new Data()));
                 }
                 else if (level==3){
-                    game.setScreen(new Level3Screen(game));
+                    game.setScreen(new Level3Screen(game,true,new Data()));
                 }
             }
             if (isButtonClicked(touchX, touchY, 674,280,203,80)) {
                 //new game
                 if(level==1){
-                    game.setScreen(new LevelScreen(game));
+                    boolean ch=true;
+                    Data d=new Data();
+                    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("lvl1.dat"))){
+                        d= (Data) ois.readObject();
+                        ch=false;
+                    } catch (IOException | ClassNotFoundException e) {
+                        System.err.println("Error loading data: " + e.getMessage());
+                    }
+                    System.out.println(d.birds_data.size());
+                    LevelScreen l=new LevelScreen(game,ch,d);
+                    game.setScreen(l);
                 }
                 else if(level==2){
-                    game.setScreen(new Level2Screen(game));
+                    boolean ch=true;
+                    Data d=new Data();
+                    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("lvl2.dat"))){
+                        d= (Data) ois.readObject();
+                        ch=false;
+                    } catch (IOException | ClassNotFoundException e) {
+                        System.err.println("Error loading data: " + e.getMessage());
+                    }
+                    System.out.println(d.birds_data.size());
+                    Level2Screen l=new Level2Screen(game,ch,d);
+                    game.setScreen(l);
                 }
                 else if (level==3){
-                    game.setScreen(new Level3Screen(game));
+                    boolean ch=true;
+                    Data d=new Data();
+                    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("lvl3.dat"))){
+                        d= (Data) ois.readObject();
+                        ch=false;
+                    } catch (IOException | ClassNotFoundException e) {
+                        System.err.println("Error loading data: " + e.getMessage());
+                    }
+                    System.out.println(d.birds_data.size());
+                    Level3Screen l=new Level3Screen(game,ch,d);
+                    game.setScreen(l);
                 }
             }
 

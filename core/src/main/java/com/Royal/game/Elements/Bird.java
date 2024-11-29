@@ -5,19 +5,21 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Disposable;
 
+import java.util.Objects;
+
 public abstract class Bird implements Disposable {
     protected Sprite sprite;
     protected Body body;
     private boolean launched;
     public int hitpoints;
     public float scale;
-
+    public String textu;
     public Bird(String texturePath, float size, float x, float y, World world, float weight,int hitpoints, float scale) {
         // Initialize sprite
         sprite = new Sprite(new Texture(texturePath));
         sprite.setSize(size, size);
         sprite.setPosition(x, y);
-
+        textu=texturePath;
         // Create physics body
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -70,6 +72,15 @@ public abstract class Bird implements Disposable {
     }
 
 
+    public int getType() {
+        if(Objects.equals(textu, "red_bird.png")){
+            return 1;
+        }
+        if(Objects.equals(textu, "blue_bird.png")){
+            return 2;
+        }
+        return 3;
+    }
 }
 
 
